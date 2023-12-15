@@ -99,6 +99,18 @@ class BlueThermalPrinter {
         'charset': charset
       });
 
+  ///Printes the [bytes] using bluetooth printer.
+  static Future<String?> writeCustomBytes(List<int> bytes) async {
+    try {
+      final String? result =
+          await _channel.invokeMethod('writeCustomBytes', bytes);
+      return result;
+    } on PlatformException catch (e) {
+      print("Failed to write bytes: '${e.message}'.");
+      return "false";
+    }
+  }
+
   ///printNewLine()
   Future<dynamic> printNewLine() => _channel.invokeMethod('printNewLine');
 

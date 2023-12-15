@@ -297,6 +297,35 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         }
         break;
 
+      case "writeCustomBytes":
+         var lista: List<Int> = call.arguments as List<Int>
+         var bytes: ByteArray = "\n".toByteArray()
+
+          lista.forEach {
+            bytes += it.toByte() //Log.d(TAG, "foreach: ${it}")
+          }
+          if(outputStream != null) {
+            try{
+              outputStream?.run {
+                write(bytes)
+                result.success("true")
+              }
+            }catch (e: Exception){
+              result.success("false")
+              outputStream = null
+              ShowToast("Device was disconnected, reconnect")
+              // Log.d(TAG, "state print: ${e.message}")
+              /*var ex:String = e.message.toString()
+              if(ex=="Broken pipe"){
+                Log.d(TAG, "Device was disconnected, reconnect")
+                ShowToast("Device was disconnected, reconnect")
+              }*/
+            }
+          }else{
+            result.success("false")
+          }
+          break;
+
       case "printCustom":
         if (arguments.containsKey("message")) {
           String message = (String) arguments.get("message");
@@ -597,6 +626,8 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
       result.error("write_error", ex.getMessage(), exceptionToString(ex));
     }
   }
+
+  
 
   private void printCustom(Result result, String message, int size, int align, String charset) {
     // Print config "mode"
