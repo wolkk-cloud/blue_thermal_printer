@@ -298,33 +298,27 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         break;
 
       case "writeCustomBytes":
-         var lista: List<Int> = call.arguments as List<Int>
-         var bytes: ByteArray = "\n".toByteArray()
+        List<Integer> lista = (List<Integer>) call.arguments;
+        byte[] bytes = "\n".getBytes();
 
-          lista.forEach {
-            bytes += it.toByte() //Log.d(TAG, "foreach: ${it}")
-          }
-          if(outputStream != null) {
-            try{
-              outputStream?.run {
-                write(bytes)
-                result.success("true")
-              }
-            }catch (e: Exception){
-              result.success("false")
-              outputStream = null
-              ShowToast("Device was disconnected, reconnect")
-              // Log.d(TAG, "state print: ${e.message}")
-              /*var ex:String = e.message.toString()
-              if(ex=="Broken pipe"){
-                Log.d(TAG, "Device was disconnected, reconnect")
-                ShowToast("Device was disconnected, reconnect")
-              }*/
+        for (Integer value : lista) {
+            bytes = Arrays.copyOf(bytes, bytes.length + 1);
+            bytes[bytes.length - 1] = value.byteValue();
+        }
+
+        if (outputStream != null) {
+            try {
+                outputStream.write(bytes);
+                result.success("true");
+            } catch (Exception e) {
+                result.success("false");
+                outputStream = null;
+                ShowToast("Device was disconnected, reconnect");
             }
-          }else{
-            result.success("false")
-          }
-          break;
+        } else {
+            result.success("false");
+        }
+    break;
 
       case "printCustom":
         if (arguments.containsKey("message")) {
