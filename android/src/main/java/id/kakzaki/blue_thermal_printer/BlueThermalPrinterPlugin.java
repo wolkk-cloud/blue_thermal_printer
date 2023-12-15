@@ -306,19 +306,13 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
             bytes[bytes.length - 1] = value.byteValue();
         }
 
-        if (outputStream != null) {
-            try {
-                outputStream.write(bytes);
-                result.success("true");
-            } catch (Exception e) {
-                result.success("false");
-                outputStream = null;
-                ShowToast("Device was disconnected, reconnect");
-            }
+        if (arguments.containsKey("message")) {
+          byte[] message = (byte[]) arguments.get("message");
+          writeCustomBytes(result, bytes);
         } else {
-            result.success("false");
+          result.error("invalid_argument", "argument 'message' not found", null);
         }
-    break;
+        break;
 
       case "printCustom":
         if (arguments.containsKey("message")) {
@@ -607,6 +601,21 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
   }
 
   private void writeBytes(Result result, byte[] message) {
+    if (THREAD == null) {
+      result.error("write_error", "not connected", null);
+      return;
+    }
+
+    try {
+      THREAD.write(message);
+      result.success(true);
+    } catch (Exception ex) {
+      Log.e(TAG, ex.getMessage(), ex);
+      result.error("write_error", ex.getMessage(), exceptionToString(ex));
+    }
+  }
+
+  private void writeCustomBytes(Result result, byte[] message) {
     if (THREAD == null) {
       result.error("write_error", "not connected", null);
       return;
