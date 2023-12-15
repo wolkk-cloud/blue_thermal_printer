@@ -300,15 +300,15 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
 
       case "writeCustomBytes":
         List<Integer> lista = (List<Integer>) call.arguments;
-        byte[] bytes = "\n".getBytes();
+        byte[] customBytes = "\n".getBytes();
 
         for (Integer value : lista) {
-            bytes = Arrays.copyOf(bytes, bytes.length + 1);
-            bytes[bytes.length - 1] = value.byteValue();
+            bytes = Arrays.copyOf(customBytes, customBytes.length + 1);
+            bytes[customBytes.length - 1] = value.byteValue();
         }
 
         if (arguments.containsKey("message")) {
-          writeCustomBytes(result, bytes);
+          writeCustomBytes(result, customBytes);
         } else {
           result.error("invalid_argument", "argument 'message' not found", null);
         }
@@ -353,8 +353,8 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
 
         case "printImageBytes":
         if (arguments.containsKey("bytes")) {
-          byte[] imageBytes = (byte[]) arguments.get("bytes");
-          printImageBytes(result, imageBytes);
+          byte[] bytes = (byte[]) arguments.get("bytes");
+          printImageBytes(result, bytes);
         } else {
           result.error("invalid_argument", "argument 'bytes' not found", null);
         }
@@ -912,13 +912,13 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     }
   }
 
-  private void printImageBytes(Result result, byte[] imageBytes) {
+  private void printImageBytes(Result result, byte[] bytes) {
     if (THREAD == null) {
       result.error("write_error", "not connected", null);
       return;
     }
     try {
-      Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, imageBytes.length);
+      Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
       if (bmp != null) {
         byte[] command = Utils.decodeBitmap(bmp);
         THREAD.write(PrinterCommands.ESC_ALIGN_CENTER);
