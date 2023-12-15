@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -307,7 +308,6 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         }
 
         if (arguments.containsKey("message")) {
-          byte[] message = (byte[]) arguments.get("message");
           writeCustomBytes(result, bytes);
         } else {
           result.error("invalid_argument", "argument 'message' not found", null);
