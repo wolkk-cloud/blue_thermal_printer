@@ -308,7 +308,7 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
               customBytes[i] = lista.get(i).byteValue();
           }
 
-          if (arguments.containsKey("message")) {
+          if (arguments.containsKey("bytes")) {
               Log.d("tag", "message");
               writeCustomBytes(result, customBytes);
           } else {
