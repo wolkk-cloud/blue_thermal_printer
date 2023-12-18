@@ -190,6 +190,14 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     }
     List<Integer> customBytesList = null; // Declare it outside the if block
 
+    Map<String, Object> arguments = new HashMap<>();
+
+    if (mBluetoothAdapter == null && !"isAvailable".equals(call.method)) {
+      result.error("bluetooth_unavailable", "the device does not have bluetooth", null);
+      return;
+    }
+    List<Integer> customBytesList = null; // Declare it outside the if block
+
     if ("writeCustomBytes".equals(call.method)) {
         customBytesList = (List<Integer>) call.arguments();
     } 
