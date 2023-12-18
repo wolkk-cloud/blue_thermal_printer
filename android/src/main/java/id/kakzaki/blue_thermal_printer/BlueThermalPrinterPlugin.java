@@ -187,8 +187,12 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
       result.error("bluetooth_unavailable", "the device does not have bluetooth", null);
       return;
     }
-
-    final Map<String, Object> arguments = call.arguments();
+    if ("writeCustomBytes".equals(call.method)) {
+          List<Integer> lista = (List<Integer>) call.arguments();
+        } else {
+           final Map<String, Object> arguments = call.arguments();
+    }
+    
     switch (call.method) {
 
       case "state":
