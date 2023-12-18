@@ -100,7 +100,7 @@ class BlueThermalPrinter {
       });
 
   ///Printes the [bytes] using bluetooth printer.
-  static Future<String?> writeCustomBytes(List<int> bytes) async {
+  Future<String?> writeCustomBytes(List<int> bytes) async {
     try {
       final String? result =
           await _channel.invokeMethod('writeCustomBytes', bytes);
