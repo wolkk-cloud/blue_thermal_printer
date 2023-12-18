@@ -299,21 +299,26 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         break;
 
       case "writeCustomBytes":
-        List<Integer> lista = call.arguments();
-        byte[] customBytes = "\n".getBytes();
+      Map<String, Object> arguments = call.arguments();
+      if (arguments.containsKey("bytes")) {
+          List<Integer> lista = (List<Integer>) arguments.get("bytes");
+          byte[] customBytes = new byte[lista.size()];
 
-        for (Integer value : lista) {
-            customBytes = Arrays.copyOf(customBytes, customBytes.length + 1);
-            customBytes[customBytes.length - 1] = value.byteValue();
-        }
+          for (int i = 0; i < lista.size(); i++) {
+              customBytes[i] = lista.get(i).byteValue();
+          }
 
-        if (call.hasArgument("message")) {
-            Log.d("tag", "message");
-            writeCustomBytes(result, customBytes);
-        } else {
-            result.error("invalid_argument", "argument 'message' not found", null);
-        } 
-        break;
+          if (arguments.containsKey("message")) {
+              Log.d("tag", "message");
+              writeCustomBytes(result, customBytes);
+          } else {
+              result.error("invalid_argument", "argument 'message' not found", null);
+          }
+      } else {
+          result.error("invalid_argument", "argument 'bytes' not found", null);
+      }
+      break;
+
 
 
       case "printCustom":
