@@ -182,7 +182,7 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result rawResult) {
     Result result = new MethodResultWrapper(rawResult);
-    Map<String, Object> arguments = call.arguments();
+    Map<String, Object> arguments = new HashMap<>();
 
     if (mBluetoothAdapter == null && !"isAvailable".equals(call.method)) {
       result.error("bluetooth_unavailable", "the device does not have bluetooth", null);
