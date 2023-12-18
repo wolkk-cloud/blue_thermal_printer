@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
@@ -102,6 +103,7 @@ class BlueThermalPrinter {
   ///Printes the [bytes] using bluetooth printer.
   Future<String?> writeCustomBytes(List<int> bytes) async {
     try {
+      log("bytes: $bytes");
       final String? result =
           await _channel.invokeMethod('writeCustomBytes', bytes);
       return result;
