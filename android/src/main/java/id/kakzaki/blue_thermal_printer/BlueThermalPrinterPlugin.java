@@ -303,6 +303,7 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
       if (arguments.containsKey("bytes")) {
           List<Integer> lista = (List<Integer>) arguments.get("bytes");
           byte[] customBytes = new byte[lista.size()];
+            Log.d("tag", "message");
 
           for (int i = 0; i < lista.size(); i++) {
               customBytes[i] = lista.get(i).byteValue();
