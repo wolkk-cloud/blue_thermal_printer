@@ -193,7 +193,9 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
 
     if ("writeCustomBytes".equals(call.method)) {
         customBytesList = (List<Integer>) call.arguments();
-    } 
+    } else {
+        arguments = call.arguments();
+    }
     
     switch (call.method) {
 
