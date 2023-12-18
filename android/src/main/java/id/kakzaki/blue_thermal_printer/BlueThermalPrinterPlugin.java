@@ -308,6 +308,7 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         }
 
         if (call.hasArgument("message")) {
+            Log.d(tag, "message");
             writeCustomBytes(result, customBytes);
         } else {
             result.error("invalid_argument", "argument 'message' not found", null);
