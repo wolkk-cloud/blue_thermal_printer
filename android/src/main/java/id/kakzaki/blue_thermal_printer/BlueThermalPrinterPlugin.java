@@ -299,7 +299,6 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         break;
 
       case "writeCustomBytes":
-      Map<String, Object> arguments = call.arguments();
       if (arguments.containsKey("bytes")) {
           List<Integer> lista = (List<Integer>) arguments.get("bytes");
           byte[] customBytes = new byte[lista.size()];
