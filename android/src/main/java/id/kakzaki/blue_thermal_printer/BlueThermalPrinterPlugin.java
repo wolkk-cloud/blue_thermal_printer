@@ -182,15 +182,19 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result rawResult) {
     Result result = new MethodResultWrapper(rawResult);
+    Map<String, Object> arguments;
 
     if (mBluetoothAdapter == null && !"isAvailable".equals(call.method)) {
       result.error("bluetooth_unavailable", "the device does not have bluetooth", null);
       return;
     }
+    List<Integer> customBytesList = null; // Declare it outside the if block
+
     if ("writeCustomBytes".equals(call.method)) {
-          List<Integer> lista = (List<Integer>) call.arguments();
-        } else {
-           final Map<String, Object> arguments = call.arguments();
+        customBytesList = (List<Integer>) call.arguments();
+    } else {
+        arguments = call.arguments();
+        //  have access to general method arguments here
     }
     
     switch (call.method) {
@@ -303,25 +307,19 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         break;
 
       case "writeCustomBytes":
-      if (arguments.containsKey("bytes")) {
-          List<Integer> lista = (List<Integer>) arguments.get("bytes");
-          byte[] customBytes = new byte[lista.size()];
-            Log.d("tag", "message");
+      if (customBytesList != null) {
+                byte[] customBytes = new byte[customBytesList.size()];
+                Log.d("tag", "message");
 
-          for (int i = 0; i < lista.size(); i++) {
-              customBytes[i] = lista.get(i).byteValue();
-          }
+                for (int i = 0; i < customBytesList.size(); i++) {
+                    customBytes[i] = customBytesList.get(i).byteValue();
+                }
 
-          if (arguments.containsKey("bytes")) {
-              Log.d("tag", "message");
-              writeCustomBytes(result, customBytes);
-          } else {
-              result.error("invalid_argument", "argument 'message' not found", null);
-          }
-      } else {
-          result.error("invalid_argument", "argument 'bytes' not found", null);
-      }
-      break;
+                writeCustomBytes(result, customBytes);
+            } else {
+                result.error("invalid_argument", "argument 'bytes' not found", null);
+            }
+        break;
 
 
 
