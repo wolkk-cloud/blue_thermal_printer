@@ -190,11 +190,13 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     List<Integer> customBytesList = null; // Declare it outside the if block
 
     Map<String, Object> arguments = new HashMap<>();
+    Log.d("MainActivity", "The value is: " + call.arguments());
 
     if ("writeCustomBytes".equals(call.method)) {
         customBytesList = (List<Integer>) call.arguments();
     } else {
         arguments = call.arguments();
+        // You have access to general method arguments here
     }
     
     switch (call.method) {
