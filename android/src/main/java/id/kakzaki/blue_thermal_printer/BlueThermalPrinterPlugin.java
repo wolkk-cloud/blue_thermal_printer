@@ -308,6 +308,7 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         break;
 
       case "writeCustomBytes":
+      Log.d("CustomBytes here", Arrays.toString(customBytes));
       if (customBytesList != null) {
                 Log.d("CustomBytes", Arrays.toString(customBytes));
 
