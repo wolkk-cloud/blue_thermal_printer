@@ -299,8 +299,8 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         break;
 
       case "writeBytes":
-        if (arguments.containsKey("bytes")) {
-          byte[] message = (byte[]) arguments.get("bytes");
+        if (arguments.containsKey("message")) {
+          byte[] message = (byte[]) arguments.get("message");
           writeBytes(result, message);
         } else {
           result.error("invalid_argument", "argument 'message' not found", null);
