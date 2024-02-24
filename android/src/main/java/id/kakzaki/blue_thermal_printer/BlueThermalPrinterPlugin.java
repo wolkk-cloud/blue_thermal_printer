@@ -424,7 +424,7 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         }
         break;
       case "checkPaperStatus":
-        checkPaperStatus(result);
+        checkPaperStatus(result); 
         break;
       default:
         result.notImplemented();
@@ -475,6 +475,42 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     } catch (SecurityException e) {
       result.error("invalid_argument", "Argument 'address' not found", null);
     }
+  }
+
+  private boolean isPaperEmpty() {
+      try {
+          // Example: Attempt to write a blank line
+          THREAD.write("\n".getBytes());
+
+          // Read the response from the printer
+          byte[] buffer = new byte[1024];
+          int bytesRead = THREAD.inputStream.read(buffer);
+
+          // Parse the response to determine paper status
+          String response = new String(buffer, 0, bytesRead);
+
+          // Check the response to determine paper status
+          return response.contains("ERROR: NO PAPER");
+      } catch (Exception ex) {
+          Log.e(TAG, ex.getMessage(), ex);
+          return false;
+      }
+  }
+
+  // Add the following method in your BluetoothPrinterPlugin class
+  private void checkPaperStatus(Result result) {
+      if (THREAD == null) {
+          result.error("write_error", "not connected", null);
+          return;
+      }
+
+      try {
+          boolean isPaperEmpty = isPaperEmpty();
+          result.success(isPaperEmpty);
+      } catch (Exception ex) {
+          Log.e(TAG, ex.getMessage(), ex);
+          result.error("write_error", ex.getMessage(), exceptionToString(ex));
+      }
   }
 
   /**
@@ -984,42 +1020,6 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
       Log.e(TAG, ex.getMessage(), ex);
       result.error("write_error", ex.getMessage(), exceptionToString(ex));
     }
-  }
-
-  private boolean isPaperEmpty() {
-      try {
-          // Example: Attempt to write a blank line
-          THREAD.write("\n".getBytes());
-
-          // Read the response from the printer
-          byte[] buffer = new byte[1024];
-          int bytesRead = THREAD.inputStream.read(buffer);
-
-          // Parse the response to determine paper status
-          String response = new String(buffer, 0, bytesRead);
-
-          // Check the response to determine paper status
-          return response.contains("ERROR: NO PAPER");
-      } catch (Exception ex) {
-          Log.e(TAG, ex.getMessage(), ex);
-          return false;
-      }
-  }
-
-  // Add the following method in your BluetoothPrinterPlugin class
-  private void checkPaperStatus(Result result) {
-      if (THREAD == null) {
-          result.error("write_error", "not connected", null);
-          return;
-      }
-
-      try {
-          boolean isPaperEmpty = isPaperEmpty();
-          result.success(isPaperEmpty);
-      } catch (Exception ex) {
-          Log.e(TAG, ex.getMessage(), ex);
-          result.error("write_error", ex.getMessage(), exceptionToString(ex));
-      }
   }
 
   private class ConnectedThread extends Thread {
