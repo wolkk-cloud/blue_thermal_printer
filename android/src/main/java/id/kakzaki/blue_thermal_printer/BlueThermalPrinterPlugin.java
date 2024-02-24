@@ -204,6 +204,10 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
         state(result);
         break;
 
+      case "isPaperNearEnd":
+        isPaperNearEnd(result);
+        break;
+
       case "isAvailable":
         result.success(mBluetoothAdapter != null);
         break;
@@ -423,9 +427,6 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
           result.error("invalid_argument", "argument 'message' not found", null);
         }
         break;
-      case "isPaperNearEnd":
-        isPaperNearEnd(); 
-        break;
       default:
         result.notImplemented();
         break;
@@ -477,10 +478,11 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     }
   }
 
-  private boolean isPaperNearEnd() {
+  private void isPaperNearEnd(Result result) {
       if (THREAD == null) {
           // Handle error: not connected
-          return false;
+          result.error("write_error", "not connected", null);
+          return;
       }
 
       try {
@@ -493,13 +495,17 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
           THREAD.read(response);
 
           // Check the response, specific values may vary based on the printer model
-          return (response[0] & 0x01) == 0x01;
+          boolean isNearEnd = (response[0] & 0x01) == 0x01;
+
+          // Communicate the result back to the caller
+          result.success(isNearEnd);
       } catch (IOException e) {
           // Handle error
           e.printStackTrace();
-          return false;
+          result.error("write_error", e.getMessage(), exceptionToString(e));
       }
   }
+
   /**
    * @param result result
    */
