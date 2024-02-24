@@ -481,29 +481,41 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
   private void isPaperNearEnd(Result result) {
       if (THREAD == null) {
           // Handle error: not connected
-          result.error("write_error", "not connected", null);
+          result.error("write_error", "Not connected", null);
           return;
       }
 
-      try {
-          // Send ESC/POS command to check paper status
-          byte[] statusCommand = new byte[]{0x10, 0x04, 0x01};
-          THREAD.write(statusCommand);
+      new Thread(() -> {
+          try {
+              // Send ESC/POS command to check paper status
+              byte[] statusCommand = new byte[]{0x10, 0x04, 0x01};
+              THREAD.write(statusCommand);
 
-          // Read response to check paper status
-          byte[] response = new byte[2];
-          THREAD.read(response);
+              // Read response to check paper status
+              byte[] response = new byte[2];
+              int bytesRead = THREAD.read(response);
 
-          // Check the response, specific values may vary based on the printer model
-          boolean isNearEnd = (response[0] & 0x01) == 0x01;
+              // Check if data was successfully read
+              if (bytesRead == response.length) {
+                  // Check the response, specific values may vary based on the printer model
+                  boolean isNearEnd = (response[0] & 0x01) == 0x01;
 
-          // Communicate the result back to the caller
-          result.success(isNearEnd);
-      } catch (IOException e) {
-          // Handle error
-          e.printStackTrace();
-          result.error("write_error", e.getMessage(), exceptionToString(e));
-      }
+                  // Communicate the result back to the caller
+                  result.success(isNearEnd);
+              } else {
+                  // Handle error: Failed to read expected data
+                  result.error("read_error", "Failed to read expected data", null);
+              }
+          } catch (IOException e) {
+              // Handle error: IOException during write or read
+              e.printStackTrace();
+              result.error("io_error", e.getMessage(), exceptionToString(e));
+          } catch (Exception ex) {
+              // Handle other unexpected exceptions
+              ex.printStackTrace();
+              result.error("unexpected_error", ex.getMessage(), exceptionToString(ex));
+          }
+      }).start();
   }
 
   /**
