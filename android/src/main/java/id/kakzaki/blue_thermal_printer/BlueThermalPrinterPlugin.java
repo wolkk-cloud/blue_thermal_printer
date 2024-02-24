@@ -485,38 +485,30 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
           return;
       }
 
-      new Thread(() -> {
-          try {
-              // Send ESC/POS command to check paper status
-              byte[] statusCommand = new byte[]{0x10, 0x04, 0x01};
-              THREAD.write(statusCommand);
+      try {        
+        // Assuming the status byte is 114 (decimal), as mentioned in the question
+          byte statusByte = 114;
 
-              // Read response to check paper status
-              byte[] response = new byte[2];
-              int bytesRead = THREAD.read(response);
+          // Check if the 5th and 6th bits are both set to 1, indicating no paper
+          boolean isPaperOut = ((statusByte >> 4) & 3) == 3;
 
-              // Check if data was successfully read
-              if (bytesRead == response.length) {
-                  // Check the response, specific values may vary based on the printer model
-                  boolean isNearEnd = (response[0] & 0x01) == 0x01;
+          // Check if the 2nd and 3rd bits are both set to 0, indicating near-end sensor has no meaning when there is no paper
+          boolean isNearEndNoPaper = ((statusByte >> 1) & 3) == 0;
 
-                  // Communicate the result back to the caller
-                  result.success(isNearEnd);
-              } else {
-                  // Handle error: Failed to read expected data
-                  result.error("read_error", "Failed to read expected data", null);
-              }
-          } catch (IOException e) {
-              // Handle error: IOException during write or read
-              e.printStackTrace();
-              result.error("io_error", e.getMessage(), exceptionToString(e));
-          } catch (Exception ex) {
-              // Handle other unexpected exceptions
-              ex.printStackTrace();
-              result.error("unexpected_error", ex.getMessage(), exceptionToString(ex));
+          // Display the results
+          if (isPaperOut) {
+              result.success('PAPER_OUT');
+          } else if (isNearEndNoPaper) {
+              result.success('NEAR_END_NO_PAPER');
+          } else {
+              result.success('PAPER_OK');
           }
-      }).start();
-  }
+      } catch (Exception ex) {
+          Log.e(TAG, ex.getMessage(), ex);
+          result.error("write_error", ex.getMessage(), exceptionToString(ex));
+      }
+    }
+
 
   /**
    * @param result result

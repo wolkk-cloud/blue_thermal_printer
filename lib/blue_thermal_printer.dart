@@ -181,13 +181,14 @@ class BlueThermalPrinter {
         'format': format
       });
 
-  Future<bool?> checkPaperStatus() async {
+  Future<String?> checkPaperStatus() async {
     try {
-      final bool? isPaperEmpty = await _channel.invokeMethod('isPaperNearEnd');
+      final String? isPaperEmpty = await _channel.invokeMethod('isPaperNearEnd');
+      print("isPaperEmpty: $isPaperEmpty");
       return isPaperEmpty;
     } catch (e) {
       print("Error checking paper status: $e");
-      return false;
+      return null;
     }
   }
 }
