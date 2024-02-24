@@ -184,7 +184,7 @@ class BlueThermalPrinter {
   Future<bool?> checkPaperStatus() async {
     try {
       final bool? isPaperEmpty =
-          await _channel.invokeMethod('checkPaperStatus');
+          await _channel.invokeMethod('isPaperNearEnd');
       return isPaperEmpty;
     } on PlatformException catch (e) {
       print("Failed to check paper status: '${e.message}'.");

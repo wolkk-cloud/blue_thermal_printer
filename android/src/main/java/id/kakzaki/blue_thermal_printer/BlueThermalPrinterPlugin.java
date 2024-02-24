@@ -423,8 +423,8 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
           result.error("invalid_argument", "argument 'message' not found", null);
         }
         break;
-      case "checkPaperStatus":
-        checkPaperStatus(result); 
+      case "isPaperNearEnd":
+        isPaperNearEnd(); 
         break;
       default:
         result.notImplemented();
@@ -477,42 +477,29 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     }
   }
 
-  private boolean isPaperEmpty() {
+  private boolean isPaperNearEnd() {
+      if (THREAD == null) {
+          // Handle error: not connected
+          return false;
+      }
+
       try {
-          // Example: Attempt to write a blank line
-          THREAD.write("\n".getBytes());
+          // Send ESC/POS command to check paper status
+          byte[] statusCommand = new byte[]{0x10, 0x04, 0x01};
+          THREAD.write(statusCommand);
 
-          // Read the response from the printer
-          byte[] buffer = new byte[1024];
-          int bytesRead = THREAD.inputStream.read(buffer);
+          // Read response to check paper status
+          byte[] response = new byte[2];
+          THREAD.read(response);
 
-          // Parse the response to determine paper status
-          String response = new String(buffer, 0, bytesRead);
-
-          // Check the response to determine paper status
-          return response.contains("ERROR: NO PAPER");
-      } catch (Exception ex) {
-          Log.e(TAG, ex.getMessage(), ex);
+          // Check the response, specific values may vary based on the printer model
+          return (response[0] & 0x01) == 0x01;
+      } catch (IOException e) {
+          // Handle error
+          e.printStackTrace();
           return false;
       }
   }
-
-  // Add the following method in your BluetoothPrinterPlugin class
-  private void checkPaperStatus(Result result) {
-      if (THREAD == null) {
-          result.error("write_error", "not connected", null);
-          return;
-      }
-
-      try {
-          boolean isPaperEmpty = isPaperEmpty();
-          result.success(isPaperEmpty);
-      } catch (Exception ex) {
-          Log.e(TAG, ex.getMessage(), ex);
-          result.error("write_error", ex.getMessage(), exceptionToString(ex));
-      }
-  }
-
   /**
    * @param result result
    */
