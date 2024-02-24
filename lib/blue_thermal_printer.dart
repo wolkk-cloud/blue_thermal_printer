@@ -180,6 +180,17 @@ class BlueThermalPrinter {
         'charset': charset,
         'format': format
       });
+
+  Future<bool?> checkPaperStatus() async {
+    try {
+      final bool? isPaperEmpty =
+          await _channel.invokeMethod('checkPaperStatus');
+      return isPaperEmpty;
+    } on PlatformException catch (e) {
+      print("Failed to check paper status: '${e.message}'.");
+      return null;
+    }
+  }
 }
 
 class BluetoothDevice {
