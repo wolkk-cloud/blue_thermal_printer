@@ -480,29 +480,35 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
 
   private void isPaperNearEnd(Result result) {
     if (THREAD == null) {
-        // Handle error: not connected
         result.success("Not connected");
         return;
     }
 
-    // Replace 114 with the actual byte received from the printer
     byte statusByte = 114;
 
-    // Check if the 5th and 6th bits are both set to 1, indicating no paper
-    boolean isPaperOut = ((statusByte >> 4) & 3) == 3;
-
-    // Check if the 2nd and 3rd bits are both set to 0, indicating near-end sensor has no meaning when there is no paper
-    boolean isNearEndNoPaper = ((statusByte >> 1) & 3) == 0;
-
-    // Communicate the results back to Flutter using result.success
-    if (isPaperOut) {
-        result.success("PAPER_OUT");
-    } else if (isNearEndNoPaper) {
-        result.success("NEAR_END_NO_PAPER");
-    } else {
-        result.success("PAPER_OK");
+    if (bluetoothSocket == null || !bluetoothSocket.isConnected() || bluetoothSocket.isClosed()) {
+        result.success("Bluetooth socket is not connected");
+        return;
     }
+
+    try {
+        boolean isPaperOut = ((statusByte >> 4) & 3) == 3;
+
+        boolean isNearEndNoPaper = ((statusByte >> 1) & 3) == 0;
+
+        if (isPaperOut) {
+            result.success("PAPER_OUT");
+        } else if (isNearEndNoPaper) {
+            result.success("NEAR_END_NO_PAPER");
+        } else {
+            result.success("PAPER_OK");
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+        result.error("write_error", "IOException during status check", null);
     }
+  }
+
 
 
   /**
