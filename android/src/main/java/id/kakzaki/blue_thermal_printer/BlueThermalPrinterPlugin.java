@@ -485,12 +485,6 @@ public class BlueThermalPrinterPlugin implements FlutterPlugin, ActivityAware,Me
     }
 
     byte statusByte = 114;
-
-    if (bluetoothSocket == null || !bluetoothSocket.isConnected() || bluetoothSocket.isClosed()) {
-        result.success("Bluetooth socket is not connected");
-        return;
-    }
-
     try {
         boolean isPaperOut = ((statusByte >> 4) & 3) == 3;
 
